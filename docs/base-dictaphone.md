@@ -7,7 +7,7 @@ Constats faits sous macOS 27 sur un Mac qui synchronise ses mémos par iCloud. A
 - `~/Library/Group Containers/group.com.apple.VoiceMemos.shared/Recordings`, protégé par macOS. Sans Accès complet au disque, sa lecture échoue (code 257), sans aucune demande à l'écran, y compris sous launchd. L'accès accordé à une app signée survit à ses mises à jour signées avec le même certificat.
 - Un fichier par mémo, à la racine : `AAAAMMJJ HHMMSS-XXXXXXXX.m4a`, ou `.qta` pour l'audio spatial de l'iPhone. Le nom contient la date et l'heure locales de l'enregistrement.
 - Pour un `.qta`, AVAudioFile lit la piste stéréo AAC, la seule activée.
-- L'encodeur inscrit dans le fichier dit l'appareil : `com.apple.VoiceMemos (Watch …)`, `(iPhone …)` ou `(iPad …)`.
+- L'encodeur inscrit dans le fichier dit l'appareil : `com.apple.VoiceMemos (Watch …)`, `(iPhone …)` ou `(iPad …)`. Les mémos récents de l'iPhone arrivent pourtant en `.qta` sans aucune métadonnée, ni encodeur, ni titre, ni date : Vocal marque `iphone` un `.qta` dont l'encodeur ne dit pas l'appareil, et prend le titre dans la base et la date dans le nom du fichier.
 - Un mémo enregistré sur la Watch arrive sur le Mac une vingtaine de secondes après la fin de l'enregistrement.
 - Un audio pas encore téléchargé peut n'être qu'un remplacement iCloud `.<nom>.icloud`.
 

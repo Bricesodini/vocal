@@ -157,4 +157,18 @@ struct EssaiTests {
         }
         #expect(!FileManager.default.fileExists(atPath: absente.path))
     }
+
+    @Test("un .qta dont l'encodeur ne dit pas l'appareil, comme les mémos récents de l'iPhone sans métadonnée, est marqué iphone")
+    func qtaSansMetadonnees() async throws {
+        let destination = try dossierTemporaire()
+        let source = try dossierTemporaire().appendingPathComponent("20261111 095639-A7D87BC5.qta")
+        try FileManager.default.copyItem(at: fixtures.appendingPathComponent("sans-meta.m4a"), to: source)
+
+        let note = try await Essai(transcripteur: TranscripteurFactice(texte: "texte"), fuseau: paris)
+            .executer(audio: source, destination: destination).url
+
+        let texte = try String(contentsOf: note, encoding: .utf8)
+        #expect(texte.contains("\nmemo: \"20261111 095639-A7D87BC5\"\nappareil: iphone\n"))
+        #expect(note.lastPathComponent == "2026-11-11 09h56 - Vocal - Vocal sans titre.md")
+    }
 }

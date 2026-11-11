@@ -1,3 +1,4 @@
+import AVFoundation
 import Foundation
 import SQLite3
 
@@ -89,6 +90,24 @@ public struct Inventaire: Sendable {
 
     /// Fichier audio visible (`.m4a` ou `.qta`, hors dossiers cachés et remplacements iCloud)
     /// modifié en dernier, en parcourant les sous-dossiers.
+    /// Métadonnées d'un fichier audio qui disent l'appareil ou le logiciel, sans aucun titre ni contenu :
+    /// les identifiants de toutes les métadonnées, et la valeur des seules clés d'encodeur, de logiciel ou de modèle.
+    public static func signature(_ audio: URL) async -> String {
+        let asset = AVURLAsset(url: audio)
+        var cles: [String] = []
+        var valeurs: [String] = []
+        for format in (try? await asset.load(.availableMetadataFormats)) ?? [] {
+            for item in (try? await asset.loadMetadata(for: format)) ?? [] {
+                let id = item.identifier?.rawValue ?? "?"
+                cles.append(id)
+                let bas = id.lowercased()
+                guard ["encod", "softw", "tool", "too", "swr", "model", "make"].contains(where: bas.contains) else { continue }
+                valeurs.append("\(id) = \((try? await item.load(.stringValue)) ?? "?")")
+            }
+        }
+        return "métadonnées : " + cles.joined(separator: ", ") + " ; encodeur : " + (valeurs.isEmpty ? "aucun" : valeurs.joined(separator: " | "))
+    }
+
     public static func dernierMemo(_ dossier: URL) -> URL? {
         let fm = FileManager.default
         var plusRecent: (URL, Date)?

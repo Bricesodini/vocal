@@ -236,6 +236,7 @@ case "observer":
             lignes.append("dernier mémo : enregistré \(iso.string(from: infos.dateEnregistrement)), arrivé sur le Mac "
                           + "\(arrivee.map(iso.string(from:)) ?? "?"), écart \(delai), appareil \(infos.appareil?.rawValue ?? "inconnu")")
         }
+        lignes.append("dernier mémo, extension \(memo.pathExtension) ; " + (await Inventaire.signature(memo)))
         do {
             let note = try await Essai(transcripteur: TranscripteurApple()).executer(audio: memo, destination: essais).url
             let mots = (try? String(contentsOf: note, encoding: .utf8))?

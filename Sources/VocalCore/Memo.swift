@@ -63,8 +63,12 @@ public struct Memo: Sendable {
         }
         guard let date else { throw CocoaError(.fileReadUnknown) }
         let titreInscrit = titre.flatMap { $0.isEmpty ? nil : $0 }
+        // Les mémos récents de l'iPhone arrivent en .qta (audio spatial) sans aucune métadonnée ; la Watch produit
+        // des .m4a avec leur encodeur. Un .qta dont l'encodeur ne dit pas l'appareil vient donc de l'iPhone.
+        let appareil = encodeur.flatMap(Appareil.init(encodeur:))
+            ?? (audio.pathExtension.lowercased() == "qta" ? .iphone : nil)
         return Memo(nom: titreInscrit ?? nomDeFichier, dateEnregistrement: date, duree: duree,
-                    appareil: encodeur.flatMap(Appareil.init(encodeur:)),
+                    appareil: appareil,
                     titreInscrit: titreInscrit, identifiant: identifiant)
     }
 
